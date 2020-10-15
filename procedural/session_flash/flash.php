@@ -101,17 +101,29 @@
 	//get array of flash if parameter is set to empty array
 	if( ! function_exists('getFlash') )
 	{
-		function getFlash($flash = false)
+		function getFlash($flash = null)
 		{
 			$defaultFlashName = 'dft_flash_name';
 
+			$flashMessages = getSession('flashMessages');
+			
+			if(is_null($flash))
+				return $flashMessages;
 
-			if(is_array($flash)) {
+			if(is_string($flash))
+			{
+				$flashData = null;
+				foreach($flashMessages as $key => $row) 
+				{
+					if( strcasecmp($row['name'] , $flash) === 0) 
+					{
+						$flashData = $row;
+						break;
+					}
+				}
 
+				return $flashData;
 			}
-			//if no flash is set return false
-			if(!getSession($defaultFlashName) && !getSession($defaultFlashName.'_class'))
-				return false;
 		}
 	}
 
