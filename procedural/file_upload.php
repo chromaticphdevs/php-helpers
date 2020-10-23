@@ -7,8 +7,12 @@
 	//load session and flash helpers
     require_once 'image_upload/autoload.php';
     
-    if(isset($_POST['_submit'])) {
+    if(isset($_POST['_multiple'])) {
         $uploads = upload_multiple('images', 'image_upload/uploads');
+    }
+
+    if(isset($_POST['_single'])) {
+        $upload = upload('image', 'image_upload/uploads');
     }
 ?>
 <!doctype html>
@@ -29,10 +33,7 @@
   </head>
 
   <body>
-
-    <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-      <a class="navbar-brand" href="https://monsterthesis.com">Home</a>
-    </nav>
+    <?php include_once('nav.php')?>
 
     <main role="main" class="container">
 
@@ -46,10 +47,20 @@
             </div>
 
             <div class="card-body">
+                <h4>Multiple</h4>
                 <form action="" method="post" enctype="multipart/form-data">
                     <input type="file" name="images[]"  multiple>
 
-                    <input type="submit" name="_submit" value=" Upload File ">
+                    <input type="submit" name="_multiple" value=" Upload File ">
+                </form>
+
+                <hr>
+
+                <h4>Single</h4>
+                <form action="" method="post" enctype="multipart/form-data">
+                    <input type="file" name="image"  multiple>
+
+                    <input type="submit" name="_single" value=" Upload File ">
                 </form>
             </div>
 
@@ -72,8 +83,8 @@
                     <?php if($uploads['status']) :?>
                         <h5 class='text-danger'> Uploaded Files (SUCCESS) <h5>
                         <ul>
-                            <?php foreach($uploads['uploads'] as $upload): ?>
-                                <li><?php echo $upload?></li>
+                            <?php foreach($uploads['uploads'] as $row): ?>
+                                <li><?php echo $row?></li>
                             <?php endforeach?>
                         </ul>
                         <ul>
@@ -93,8 +104,32 @@
                         <?php foreach($uploads['files'] as $key => $file) : ?>
                             <li><?php echo $file?></li>
                         <?php endforeach?>
+                        <li><strong>Base Path : <?php echo $uploads['path']?></strong></li>
                     </ul>
 
+                </div>
+            <?php endif?>
+
+            <?php if(isset($upload)) :?>
+                <div class="card-footer">
+                    <?php if(!$upload['status']) :?>
+                        <h4>Upload Failed</h4>
+                        <ul>
+                            <li>Error : <?php echo implode(',' , $upload['errors']) ?></li>
+                            <li>File : <?php echo $upload['file']?></li>
+                            <li>Path : <?php echo $upload['path']?></li>
+                        </ul>
+                    <?php endif?>
+
+                    <?php if($upload['status']):?>
+                        <h4>Upload Success</h4>
+                        <ul>
+                            <li>Upload : <?php echo $upload['upload']?></li>
+                            <li>Upload With Path : <?php echo $upload['uploadWithPath']?></li>
+                            <li>File : <?php echo $upload['file']?></li>
+                            <li>Path : <?php echo $upload['path']?></li>
+                        </ul>
+                    <?php endif?>
                 </div>
             <?php endif?>
         </div>

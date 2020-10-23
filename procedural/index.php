@@ -59,9 +59,7 @@
 
   <body>
 
-    <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-      <a class="navbar-brand" href="https://monsterthesis.com">Home</a>
-    </nav>
+  	<?php include_once('nav.php')?>
 
     <main role="main" class="container">
 

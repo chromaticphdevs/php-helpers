@@ -46,7 +46,7 @@
          */
         $oldNames = [];
         /**
-         * Uploaded names
+         * Allowed Extensions
          */
         $allowed_ext = array('jpeg' , 'jpg' , 'png');
 
@@ -140,5 +140,97 @@
 
     function upload($fileName , $uploadPath , $prefix = 'SIMPLE-')
     {
+        $isOk = true;
+        /**
+         * Save errors here
+         */
+        $errors = [];
+        /**
+         * Minimum size of image
+         * delete minsize instance to remove file limit upload
+         */
+        $minSize = 100;
+        /**
+         * Maximum size of image
+         * delete maxSize instance to remove file limit upload
+         */
+        $maxSize = 3000000; // three million
 
+        /**
+         * uploaded file new name
+         */
+        $upload = null;
+        /**
+         * uploaded file new name with path
+         */
+        $uploadWithPath = null;
+        /**
+         * file upload old name
+         */
+        $file = null;
+
+
+        $allowed_ext = array('jpeg' , 'jpg' , 'png');
+
+        $fileUploaded = $_FILES[$fileName];
+
+        $fileUploadName = $fileUploaded['name'];
+        $fileSize  = $fileUploaded['size'];
+
+        $fileExt = explode('.' , $fileUploadName);
+        $fileExt = strtolower($fileExt[1]);
+
+
+        //check file size
+        if(isset($minSize) && $fileSize < $minSize)
+        {   
+            //write minsize error
+            $min = $minSize. ' bytes (' . intval($minSize / 1000) . ')kb';
+            array_push($errors , "{$fileUploadName} image too small min size {$min}");
+        }
+
+        if(isset($maxSize) && $fileSize > $maxSize)
+        {
+            //write max size error
+            //write minsize error
+            $max = $maxSize. ' bytes (' . intval($maxSize / 1000) . ')kb';
+            array_push($errors , "{$fileUploadName} image too large min size {$max}");
+        }
+
+        if(in_array($fileExt , $allowed_ext))
+        {
+            /**
+             * create new name for the uploaded file
+             */
+            $uploadNewName = uniqid($prefix , true).".{$fileExt}";
+            $sourcePath = $_FILES[$fileName]['tmp_name'];
+            $uploadFullPath = $uploadPath.DIRECTORY_SEPARATOR.$uploadNewName;
+
+            //creates new file if not exists
+            if(!file_exists($uploadPath)){
+                mkdir($uploadPath);
+            }
+
+            if(move_uploaded_file($sourcePath, $uploadFullPath))
+            {
+                $upload = $uploadNewName;
+                $uploadWithPath  = $uploadFullPath;
+                $file = $fileUploadName;
+            }else{
+                array_push($errors , "{$fileUploadName} failed to be uploaded");
+            }
+        }else
+        {
+            $isOk  = false;
+            array_push($errors , "{$fileUploadName} invalid extension '{$fileExt}' ");
+        }
+
+        return [
+            'status' => $isOk,
+            'upload' => $upload,
+            'errors' => $errors,
+            'path'   => $uploadPath,
+            'file'   => $file,
+            'uploadWithPath' => $uploadWithPath
+        ];
     }
