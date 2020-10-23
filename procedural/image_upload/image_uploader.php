@@ -31,12 +31,6 @@
          * delete maxSize instance to remove file limit upload
          */
         $maxSize = 3000000; // three million
-        
-        /**
-         * default dimensions
-         * Width , Height
-         */
-        $dimension = [12000, 12000];
         /**
          * File names
          * that uploaded to the server
@@ -137,4 +131,14 @@
             'files' => $oldNames,
             'uploadsWithPath' => $uploadedFilesWithPath
         ];
+    }
+
+
+    /**
+     * SINGLE FILE UPLOAD
+     */
+
+    function upload($fileName , $uploadPath , $prefix = 'SIMPLE-')
+    {
+
     }
